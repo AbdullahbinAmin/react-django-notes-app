@@ -1,0 +1,8 @@
+data/
+.git/
+mynotes/node_modules/
+venv/
+.venv/
+__pycache__/
+*.sqlite3
+db.sqlite3
