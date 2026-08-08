@@ -10,6 +10,13 @@ pipeline {
             }
         }
 
+        stage('Cleanup Disk Space') {
+            steps {
+                echo "Cleaning up dangling Docker images and cache to free disk space..."
+                sh 'docker system prune -f || true'
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 echo "Building Docker image (Frontend + Backend Multi-stage)..."
@@ -52,4 +59,12 @@ pipeline {
             }
         }
     }
-}
+
+    post {
+        always {
+            echo "Cleaning up dangling Docker images..."
+            sh 'docker image prune -f || true'
+        }
+    }
+}
+
