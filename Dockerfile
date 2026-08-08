@@ -1,26 +1,32 @@
-FROM python:3.9
+# Stage 1: Build React Frontend
+FROM node:18-alpine AS frontend-builder
+WORKDIR /app/frontend
+COPY mynotes/package*.json ./
+RUN npm install
+COPY mynotes/ ./
+RUN npm run build
 
-# Set the working Directory inside the container
+# Stage 2: Django Backend & Serving Frontend
+FROM python:3.9-slim
+
 WORKDIR /app/backend
 
-# Copy requirements.txt to install dependencies
-COPY requirements.txt /app/backend
-
-# Install System packages required for MYSQL Client Compilation
+# Install System packages required for MySQL Client Compilation
 RUN apt-get update \
-	&& apt-get upgrade -y \
 	&& apt-get install -y gcc default-libmysqlclient-dev pkg-config \
 	&& rm -rf /var/lib/apt/lists/*
 
-# Install python dependencies
+COPY requirements.txt /app/backend/
 RUN pip install mysqlclient
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the application files
+# Copy backend application code
 COPY . /app/backend
 
-# Expose Django Port
+# Copy built React static files from frontend-builder stage
+COPY --from=frontend-builder /app/frontend/build /app/backend/mynotes/build
+
 EXPOSE 8000
 
-# Start Server using gunicorn in production
-CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"] 
+CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
+

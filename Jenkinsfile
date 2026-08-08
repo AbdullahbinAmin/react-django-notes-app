@@ -10,36 +10,35 @@ pipeline {
             }
         }
 
-        stage('Build React Frontend') {
-            steps {
-                echo "Building React static files..."
-                dir('mynotes') {
-                    sh 'npm install'
-                    sh 'npm run build'
-                }
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
-                echo "Building Docker image notes-app:latest..."
+                echo "Building Docker image (Frontend + Backend Multi-stage)..."
                 sh "docker build -t notes-app:latest ."
             }
         }
 
         stage('Push to Docker Hub') {
             steps {
-                echo "Logging in to Docker Hub non-interactively..."
+                echo "Logging in to Docker Hub..."
                 withCredentials([
                     usernamePassword(
                         credentialsId: 'dockerHubCred', 
                         passwordVariable: 'dockerHubPass', 
                         usernameVariable: 'dockerHubUser'
-                        )]) 
-                {
+                    )
+                ]) {
                     sh "docker login -u ${env.dockerHubUser} -p '${env.dockerHubPass}'"
                     sh "docker image tag notes-app:latest ${env.dockerHubUser}/notes-app:latest"
                     sh "docker push ${env.dockerHubUser}/notes-app:latest"
+                }
+            }
+        }
+
+        stage('Setup Environment (.env)') {
+            steps {
+                echo "Injecting .env file from Jenkins Secret File credential..."
+                withCredentials([file(credentialsId: 'django-env-file', variable: 'ENV_FILE')]) {
+                    sh 'cp $ENV_FILE .env'
                 }
             }
         }
@@ -53,5 +52,4 @@ pipeline {
             }
         }
     }
-
-}
+}
