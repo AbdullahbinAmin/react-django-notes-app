@@ -12,8 +12,9 @@ pipeline {
 
         stage('Cleanup Disk Space') {
             steps {
-                echo "Cleaning up dangling Docker images and cache to free disk space..."
-                sh 'docker system prune -f || true'
+                echo "Cleaning up all unused Docker images, containers, and build cache to free disk space..."
+                sh 'docker system prune -af --volumes || true'
+                sh 'docker builder prune -af || true'
             }
         }
 
