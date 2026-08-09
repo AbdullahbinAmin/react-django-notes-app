@@ -11,9 +11,9 @@ FROM python:3.9-slim
 
 WORKDIR /app/backend
 
-# Install System packages required for MySQL Client Compilation
+# Install System packages required for MySQL Client Compilation and Healthchecks
 RUN apt-get update \
-	&& apt-get install -y gcc default-libmysqlclient-dev pkg-config \
+	&& apt-get install -y gcc default-libmysqlclient-dev pkg-config curl \
 	&& rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt /app/backend/
@@ -29,4 +29,3 @@ COPY --from=frontend-builder /app/frontend/build /app/backend/mynotes/build
 EXPOSE 8000
 
 CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
-

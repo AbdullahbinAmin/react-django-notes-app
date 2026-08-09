@@ -125,10 +125,10 @@ jobs:
         run: |
           docker compose up -d --build
 
-      - name: Check Container Status
+      - name: Wait for Services & Check Status
         run: |
-          docker compose ps
-          sleep 10
+          echo "Waiting for database and web containers..."
+          sleep 20
           docker compose ps
 
       - name: Tear Down Containers

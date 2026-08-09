@@ -5,6 +5,7 @@ services:
     container_name: "nginx_cont"
     ports:
       - "80:80"
+      - "443:443"
     restart: always
     depends_on:
       - django_app
