@@ -52,6 +52,19 @@ docker-compose up --build
 ```
 Open your browser and navigate to **`https://abdullahbinamin.qzz.io`** (accept the self-signed certificate warning for local development).
 
+## 🔄 CI/CD Pipeline (GitHub Actions)
+
+The project includes an automated **GitHub Actions** workflow (`.github/workflows/ci-cd.yml`) that triggers on every push or pull request to `main`/`master`:
+
+1. **Build & Test**: Compiles React static assets and verifies Python dependencies.
+2. **Docker Build & Push**: Builds the multi-stage Docker image and pushes to Docker Hub.
+3. **Integration Test**: Boots up all container services (`django_app`, `db`, `nginx`) via Docker Compose to verify deployment readiness.
+
+### GitHub Secrets Setup
+To enable Docker Hub image publishing in GitHub Actions, configure the following secrets in **Settings > Secrets and variables > Actions**:
+- `DOCKERHUB_USERNAME`: Your Docker Hub username
+- `DOCKERHUB_TOKEN`: Your Docker Hub Personal Access Token
+
 ---
 
 ## 📦 Production Deployment
@@ -71,4 +84,6 @@ For deploying on a live cloud server (like AWS, DigitalOcean, or Linode):
    ```bash
    docker-compose up -d --build
    ```
+
+
 
