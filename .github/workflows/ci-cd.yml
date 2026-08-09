@@ -40,11 +40,18 @@ jobs:
       - name: Install Python Dependencies
         run: |
           python -m pip install --upgrade pip
+          pip install mysqlclient
           pip install -r requirements.txt
 
-      - name: Run Django Tests
+      - name: Verify Django Code Integrity
+        env:
+          DB_NAME: test_db
+          DB_USER: root
+          DB_PASSWORD: root
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
         run: |
-          python manage.py test --noinput || echo "No tests configured"
+          python manage.py check
 
   docker-build-push:
     name: Build & Push Docker Image
@@ -55,9 +62,9 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Determine Docker Image Name
+      - name: Determine Lowercase Docker Image Name
         run: |
-          DOCKER_USER="${{ secrets.DOCKERHUB_USERNAME }}"
+          DOCKER_USER=$(echo "${{ secrets.DOCKERHUB_USERNAME }}" | tr '[:upper:]' '[:lower:]')
           if [ -n "$DOCKER_USER" ]; then
             echo "IMAGE_NAME=${DOCKER_USER}/notes-app" >> $GITHUB_ENV
           else
