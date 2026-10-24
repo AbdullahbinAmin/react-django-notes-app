@@ -28,6 +28,12 @@ yarn-error.log*
 # custom overrides
 data/
 .env
+*.env
+!.env.example
 db.sqlite3
+*.sqlite3
 staticfiles/
+nginx/ssl/*.key
+*.key
+*.pem
 
